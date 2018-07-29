@@ -42,6 +42,7 @@
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <RelativeLayout
+        android:visibility="gone"
         android:id="@+id/rl_loading"
         android:layout_alignParentBottom="true"
         android:background="#fff"
@@ -60,5 +61,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_camera"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.dlimagecoder.base.BaseActivity;
 import com.example.dlimagecoder.common.Constrants;
+import com.example.dlimagecoder.util.NetUtil;
 import com.example.dlimagecoder.util.ToastUtil;
 
 public class LoginActivity extends BaseActivity {
@@ -64,6 +65,8 @@ public class LoginActivity extends BaseActivity {
 
     private void checkLogin() {
         if (preferences.getBoolean(IS_LOGIN,false)){
+            NetUtil.id = preferences.getString(Constrants.ID,null);
+            NetUtil.pwd = preferences.getString(Constrants.PASSWORD,null);
             startActivity(new Intent(this,MainActivity.class));
         }
     }
@@ -101,6 +104,7 @@ public class LoginActivity extends BaseActivity {
         SharedPreferences.Editor editor=preferences.edit();
         editor.putString(Constrants.ID,id);
         editor.putString(Constrants.PASSWORD,pwd);
+        editor.putBoolean(IS_LOGIN,true);
         editor.commit();
     }
 
