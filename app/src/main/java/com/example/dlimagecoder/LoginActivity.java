@@ -9,21 +9,34 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dlimagecoder.base.BaseActivity;
 import com.example.dlimagecoder.common.Constrants;
+import com.example.dlimagecoder.netmodel.NetResult;
 import com.example.dlimagecoder.util.NetUtil;
 import com.example.dlimagecoder.util.ToastUtil;
+import com.qiniu.common.Zone;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.UploadManager;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import rx.Scheduler;
+import rx.functions.Action1;
 
 public class LoginActivity extends BaseActivity {
 
-    private final String IS_LOGIN ="is_login";
+    private final String IS_LOGIN = "is_login";
 
     private TextInputEditText idEt;
     private TextInputEditText pwdEt;
     private Button loginPwd;
     private SharedPreferences preferences;
+    private TextView registerTxt;
 
 
     @Override
@@ -33,15 +46,15 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void initVariable() {
-        preferences=getPreferences(Context.MODE_PRIVATE);
+        preferences = getPreferences(Context.MODE_PRIVATE);
     }
 
     @Override
     protected void initView() {
-        idEt=findViewById(R.id.et_id);
-        pwdEt=findViewById(R.id.et_pwd);
-        loginPwd=findViewById(R.id.btn_login);
-
+        idEt = findViewById(R.id.et_id);
+        pwdEt = findViewById(R.id.et_pwd);
+        loginPwd = findViewById(R.id.btn_login);
+        registerTxt = findViewById(R.id.tv_register);
 
     }
 
@@ -52,32 +65,52 @@ public class LoginActivity extends BaseActivity {
         loginPwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String id=idEt.getText().toString().trim();
-                String pwd=pwdEt.getText().toString().trim();
-                if (TextUtils.isEmpty(id)||TextUtils.isEmpty(pwd)){
-                    Toast.makeText(LoginActivity.this,"账号密码不能为空",Toast.LENGTH_SHORT).show();
+                String id = idEt.getText().toString().trim();
+                String pwd = pwdEt.getText().toString().trim();
+                if (TextUtils.isEmpty(id) || TextUtils.isEmpty(pwd)) {
+                    Toast.makeText(LoginActivity.this, "账号密码不能为空", Toast.LENGTH_SHORT).show();
                 } else {
-                    login(listener);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            login(listener);
+                        }
+                    }).start();
                 }
             }
         });
+
     }
 
     private void checkLogin() {
-        if (preferences.getBoolean(IS_LOGIN,false)){
-            NetUtil.id = preferences.getString(Constrants.ID,null);
-            NetUtil.pwd = preferences.getString(Constrants.PASSWORD,null);
-            startActivity(new Intent(this,MainActivity.class));
+        if (preferences.getBoolean(IS_LOGIN, false)) {
+            NetUtil.id = preferences.getString(Constrants.ID, null);
+            NetUtil.pwd = preferences.getString(Constrants.PASSWORD, null);
+            startActivity(new Intent(this, MainActivity.class));
         }
     }
 
-    private void login(LoginListener listener) {
-        listener.onSuccess();
+    private void login(final LoginListener listener) {
+        String id = idEt.getText().toString();
+        String pwd = pwdEt.getText().toString();
+        if (id.isEmpty() || pwd.isEmpty()) {
+            ToastUtil.showToast("输入不能为空");
+        }
+        NetUtil.getAppUrl().login(id, pwd)
+                .subscribe(new Action1<NetResult>() {
+                    @Override
+                    public void call(NetResult netResult) {
+                        if (netResult.isSuccessful()) {
+                            listener.onSuccess();
+                        } else {
+                            listener.onFailed();
+                        }
+                    }
+                });
     }
 
 
-
-    private interface LoginListener{
+    private interface LoginListener {
         void onSuccess();
 
         void onFailed();
@@ -86,26 +119,42 @@ public class LoginActivity extends BaseActivity {
     private LoginListener listener = new LoginListener() {
         @Override
         public void onSuccess() {
-            ToastUtil.showToast("登陆成功");
-            storeAccount();
-            startActivity(new Intent(LoginActivity.this,MainActivity.class));
-            finish();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ToastUtil.showToast("登陆成功");
+                    storeAccount();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                }
+            });
         }
 
         @Override
         public void onFailed() {
-            ToastUtil.showToast("登陆失败");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ToastUtil.showToast("登陆失败");
+                }
+            });
         }
     };
 
     private void storeAccount() {
-        String id=idEt.getText().toString().trim();
-        String pwd=pwdEt.getText().toString().trim();
-        SharedPreferences.Editor editor=preferences.edit();
-        editor.putString(Constrants.ID,id);
-        editor.putString(Constrants.PASSWORD,pwd);
-        editor.putBoolean(IS_LOGIN,true);
+        String id = idEt.getText().toString().trim();
+        String pwd = pwdEt.getText().toString().trim();
+        NetUtil.id = id;
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(Constrants.ID, id);
+        editor.putString(Constrants.PASSWORD, pwd);
+        editor.putBoolean(IS_LOGIN, true);
         editor.commit();
     }
 
+
+    public void register(View v) {
+        startActivity(new Intent(this, RegisterActivity.class));
+    }
 }

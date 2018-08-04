@@ -9,12 +9,14 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import com.example.dlimagecoder.base.BaseActivity;
+import com.example.dlimagecoder.util.Tool;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.entity.LocalMedia;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CameraActivity extends BaseActivity {
@@ -23,8 +25,11 @@ public class CameraActivity extends BaseActivity {
 
     private SurfaceHolder holder;
     private Camera camera;
+    private List<String> images;//已经处理完的图片
 
     public final static String IMAGE_PATH = "image_path";
+    public final static String IMAGES = "images";
+    private final static int EDIT = 21;
 
     @Override
     protected int getResourceId() {
@@ -33,7 +38,7 @@ public class CameraActivity extends BaseActivity {
 
     @Override
     protected void initVariable() {
-
+        images = new ArrayList<>();
     }
 
     @Override
@@ -94,12 +99,20 @@ public class CameraActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode==RESULT_OK&&requestCode==PictureConfig.CHOOSE_REQUEST){
-            List<LocalMedia> selectList = PictureSelector.obtainMultipleResult(data);
-            String path=selectList.get(0).getPath();
-            Intent intent = new Intent(CameraActivity.this,EditActivity.class);
-            intent.putExtra(IMAGE_PATH,path);
-            startActivity(intent);
+        if (resultCode==RESULT_OK){
+            switch (requestCode){
+                case PictureConfig.CHOOSE_REQUEST:
+                    List<LocalMedia> selectList = PictureSelector.obtainMultipleResult(data);
+                    String path=selectList.get(0).getPath();
+                    Intent intent = new Intent(CameraActivity.this,EditActivity.class);
+                    intent.putExtra(IMAGE_PATH,path);
+                    intent.putExtra(IMAGES, Tool.imagesToString(images));
+                    startActivityForResult(intent,EDIT);
+                    break;
+                case EDIT:
+                    images = Tool.getImagesFromString(data.getStringExtra(IMAGES));
+                    break;
+            }
         }
     }
 
@@ -112,7 +125,8 @@ public class CameraActivity extends BaseActivity {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(tempData, 0, tempData.length);
                 Intent intent  = new Intent(CameraActivity.this,EditActivity.class);
                 intent.putExtra(IMAGE_PATH,bitmap);
-                startActivity(intent);
+                intent.putExtra(IMAGES, Tool.imagesToString(images));
+                startActivityForResult(intent,EDIT);
             }
         }
     }

@@ -7,13 +7,18 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.base.BaseActivity;
+import com.example.dlimagecoder.util.ToastUtil;
+import com.example.dlimagecoder.util.Tool;
+
+import java.util.List;
 
 public class EditActivity extends BaseActivity {
 
     private ImageView image;
 
-    private String imagePath;
+    private String currentImagePath;
     private Bitmap currentBitmap;
+    private List<String> images;//已经处理好的图片
 
     @Override
     protected int getResourceId() {
@@ -22,7 +27,9 @@ public class EditActivity extends BaseActivity {
 
     @Override
     protected void initVariable() {
-        imagePath = getIntent().getStringExtra(CameraActivity.IMAGE_PATH);
+        Intent intent  =getIntent();
+        currentImagePath = intent.getStringExtra(CameraActivity.IMAGE_PATH);
+        images = Tool.getImagesFromString(intent.getStringExtra(CameraActivity.IMAGES));
     }
 
     @Override
@@ -32,13 +39,31 @@ public class EditActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        Glide.with(this).load(imagePath).into(image);
+        Glide.with(this).load(currentImagePath).into(image);
 
     }
 
+    //下一步
     public void next(View view){
-        Intent intent = new Intent(this,PreviewActivity.class);
-        intent.putExtra(CameraActivity.IMAGE_PATH,imagePath);
-        startActivity(intent);
+        if (!currentImagePath.isEmpty()){
+            images.add(currentImagePath);
+        }
+        if (images.size()>0){
+            Intent intent = new Intent(this,PreviewActivity.class);
+            intent.putExtra(CameraActivity.IMAGES,Tool.imagesToString(images));
+            startActivity(intent);
+        } else {
+            ToastUtil.showToast("帖子必须含有图片");
+        }
     }
+
+    //下一张
+    public void nextImage(View v){
+        images.add(currentImagePath);
+        Intent intent = new Intent();
+        intent.putExtra(CameraActivity.IMAGES,Tool.imagesToString(images));
+        setResult(RESULT_OK,intent);
+        finish();
+    }
+
 }

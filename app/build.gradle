@@ -16,9 +16,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {//加上这写代码
+        pickFirst 'META-INF/*'
+    }
 }
 
-ext{
+ext {
     COMMIT_ID = "123QWER"
 }
 
@@ -34,6 +38,10 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.2.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.2.0'
     implementation 'com.github.LuckSiege:PictureSelectorLight:v2.1.0'
+    implementation 'com.qiniu:qiniu-java-sdk:7.2.+'
+
+    implementation 'io.reactivex:rxandroid:1.1.0'
+    implementation 'io.reactivex:rxjava:1.1.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
