@@ -10,16 +10,24 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.dlimagecoder.adapter.TieziAdapter;
 import com.example.dlimagecoder.base.BaseActivity;
+import com.example.dlimagecoder.common.Constrants;
+import com.example.dlimagecoder.netmodel.NetResult;
+import com.example.dlimagecoder.netmodel.Tiezi;
+import com.example.dlimagecoder.util.NetUtil;
 import com.example.dlimagecoder.util.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.functions.Action1;
 
 public class MainActivity extends BaseActivity {
 
@@ -30,6 +38,9 @@ public class MainActivity extends BaseActivity {
 
     private final int REQUEST_PER = 1;
     private boolean loading = false;
+    private List<Tiezi> list;
+    private TieziAdapter adapter;
+    private boolean end = false;//没有更多数据了
 
 
     @Override
@@ -39,7 +50,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initVariable() {
-
+        list = new ArrayList<>();
+        adapter = new TieziAdapter(this,list);
     }
 
     @Override
@@ -48,6 +60,8 @@ public class MainActivity extends BaseActivity {
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         loadingMoreRL = findViewById(R.id.rl_loading);
         rv = findViewById(R.id.rv);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setAdapter(adapter);
     }
 
     @Override
@@ -80,7 +94,7 @@ public class MainActivity extends BaseActivity {
                 if (loading){//防止同时多次调用
                     return;
                 }
-                if (Tool.isSlideToBottom(recyclerView)) {
+                if (Tool.isSlideToBottom(recyclerView)&&!end) {
                     loadMore();
                 }
             }
@@ -89,11 +103,57 @@ public class MainActivity extends BaseActivity {
 
     //底部加载
     private void loadMore() {
+        if (list.isEmpty()){
+            return;
+        }
         loadingMoreRL.setVisibility(View.VISIBLE);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),list.get(list.size()-1).getId())
+                        .subscribe(new Action1<NetResult>() {
+                            @Override
+                            public void call(NetResult netResult) {
+                                // TODO:
+                                List<Tiezi> list1 = new ArrayList<>();
+                                final int start = list.size();
+                                list.addAll(list1);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        loadingMoreRL.setVisibility(View.GONE);
+                                        adapter.notifyItemRangeChanged(start,list.size()-1);
+                                    }
+                                });
+                            }
+                        });
+            }
+        }).start();
     }
 
     //更新列表
     private void refresh() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),-1)
+                        .subscribe(new Action1<NetResult>() {
+                            @Override
+                            public void call(NetResult netResult) {
+                                // TODO:
+                                List<Tiezi> list1 = new ArrayList<>();
+                                list.clear();
+                                list.addAll(list1);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        });
+            }
+        }).start();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
