@@ -9,12 +9,15 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import com.example.dlimagecoder.base.BaseActivity;
+import com.example.dlimagecoder.util.FileUtil;
+import com.example.dlimagecoder.util.PictureUtil;
 import com.example.dlimagecoder.util.Tool;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.entity.LocalMedia;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +74,7 @@ public class CameraActivity extends BaseActivity {
             }
             Camera.Parameters params = camera.getParameters();
             params.setJpegQuality(100);//照片质量
-            params.setPictureSize(1024, 768);//图片分辨率
+            params.setPictureSize(1080, 1920);//图片分辨率
             params.setPreviewFrameRate(5);//预览帧率
 
             camera.setDisplayOrientation(90);
@@ -119,12 +122,12 @@ public class CameraActivity extends BaseActivity {
     private class TakePictureCallback implements Camera.PictureCallback {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream(data.length);
-            byte[] tempData = os.toByteArray();
-            if (tempData != null && tempData.length > 0) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(tempData, 0, tempData.length);
+            //ByteArrayOutputStream os = new ByteArrayOutputStream(data.length);
+            //byte[] tempData = os.toByteArray();
+            if (data != null && data.length > 0) {
+                Bitmap bitmap = PictureUtil.rotateToDegrees(BitmapFactory.decodeByteArray(data, 0, data.length),90);
                 Intent intent  = new Intent(CameraActivity.this,EditActivity.class);
-                intent.putExtra(IMAGE_PATH,bitmap);
+                intent.putExtra(IMAGE_PATH, FileUtil.storeImage(bitmap));
                 intent.putExtra(IMAGES, Tool.imagesToString(images));
                 startActivityForResult(intent,EDIT);
             }
