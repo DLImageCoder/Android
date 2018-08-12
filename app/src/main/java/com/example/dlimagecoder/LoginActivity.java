@@ -30,7 +30,7 @@ import rx.functions.Action1;
 
 public class LoginActivity extends BaseActivity {
 
-    private final String IS_LOGIN = "is_login";
+    public static final String IS_LOGIN = "is_login";
 
     private TextInputEditText idEt;
     private TextInputEditText pwdEt;
@@ -87,6 +87,7 @@ public class LoginActivity extends BaseActivity {
             NetUtil.id = preferences.getString(Constrants.ID, null);
             NetUtil.pwd = preferences.getString(Constrants.PASSWORD, null);
             startActivity(new Intent(this, MainActivity.class));
+            finish();
         }
     }
 

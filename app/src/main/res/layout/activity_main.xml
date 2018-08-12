@@ -22,6 +22,7 @@
     <TextView
         android:id="@+id/tv_block"
         android:text="注销"
+        android:onClick="quit"
         android:textColor="#e12c2c"
         android:layout_marginRight="16dp"
         android:layout_alignParentRight="true"
@@ -68,7 +69,8 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="20dp"
-        android:background="@drawable/add"
+        android:src="@drawable/add"
+        app:backgroundTint="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

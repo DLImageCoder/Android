@@ -99,7 +99,7 @@ public class PreviewActivity extends BaseActivity {
                         e.printStackTrace();
                     }
                 }
-                NetUtil.getAppUrl().post(Integer.parseInt(NetUtil.id),text,Tool.imagesToString(imageUrls))
+                NetUtil.getAppUrl().post(Integer.parseInt(NetUtil.id),Tool.UTF8(text),Tool.imagesToString(imageUrls))
                         .subscribe(new Action1<NetResult>() {
                             @Override
                             public void call(final NetResult netResult) {

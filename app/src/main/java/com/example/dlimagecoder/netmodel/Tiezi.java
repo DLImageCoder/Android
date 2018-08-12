@@ -1,6 +1,8 @@
 package com.example.dlimagecoder.netmodel;
 
-public class Tiezi {
+import java.io.Serializable;
+
+public class Tiezi implements Serializable{
     private int id;
 
     public int getId() {

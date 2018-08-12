@@ -1,17 +1,27 @@
 package com.example.dlimagecoder;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
 import com.example.dlimagecoder.base.BaseActivity;
+import com.example.dlimagecoder.common.Constrants;
+import com.example.dlimagecoder.netmodel.NetResult;
 import com.example.dlimagecoder.util.NetUtil;
 import com.example.dlimagecoder.util.ToastUtil;
+
+import rx.functions.Action1;
 
 public class RegisterActivity extends BaseActivity {
 
     private TextInputEditText etId,etPwd;
+
+    private SharedPreferences preferences;
+
 
     @Override
     protected int getResourceId() {
@@ -20,7 +30,7 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initVariable() {
-
+        preferences = getPreferences(Context.MODE_PRIVATE);
     }
 
     @Override
@@ -35,12 +45,38 @@ public class RegisterActivity extends BaseActivity {
     }
 
     public void register(View v){
-        String id = etId.getText().toString();
-        String pwd = etPwd.getText().toString();
+        final String id = etId.getText().toString();
+        final String pwd = etPwd.getText().toString();
         if (id.isEmpty()||pwd.isEmpty()){
             ToastUtil.showToast("账号密码不能为空");
         } else {
-            //NetUtil.getAppUrl().
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NetUtil.getAppUrl().register(id,pwd).subscribe(new Action1<NetResult>() {
+                        @Override
+                        public void call(NetResult netResult) {
+                            if (netResult.isSuccessful()){
+                                storeAccount();
+                                startActivity(new Intent(RegisterActivity.this,UserInfoActivity.class));
+                                finish();
+                            }
+                        }
+                    });
+                }
+            }).start();
         }
+    }
+
+    private void storeAccount() {
+        String id = etId.getText().toString().trim();
+        String pwd = etPwd.getText().toString().trim();
+        NetUtil.id = id;
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(Constrants.ID, id);
+        editor.putString(Constrants.PASSWORD, pwd);
+        editor.putBoolean(LoginActivity.IS_LOGIN, true);
+        editor.commit();
     }
 }

@@ -5,7 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.List;
 
 public class Tool {
@@ -22,8 +24,19 @@ public class Tool {
         return new Gson().toJson(imagePaths);
     }
 
+
+    //解析出图片地址数组
     public static List<String> getImagesFromString(String json){
         Type listType = new TypeToken<List<String>>(){}.getType();
         return new Gson().fromJson(json,listType);
+    }
+    //UTF-8编码字符串
+    public static String UTF8(String str){
+        try {
+            return URLEncoder.encode(str,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

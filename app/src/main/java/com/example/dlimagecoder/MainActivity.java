@@ -2,7 +2,11 @@ package com.example.dlimagecoder;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -52,6 +56,20 @@ public class MainActivity extends BaseActivity {
     protected void initVariable() {
         list = new ArrayList<>();
         adapter = new TieziAdapter(this,list);
+        adapter.setLisenter(new TieziAdapter.OnItenClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Tiezi tiezi = list.get(position);
+                Intent intent = new Intent(MainActivity.this,TieziDetailActivity.class);
+                intent.putExtra("tiezi",tiezi);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        });
     }
 
     @Override
@@ -182,5 +200,25 @@ public class MainActivity extends BaseActivity {
                 return;
             }
         }
+    }
+
+    //注销
+    public void quit(View v){
+        new AlertDialog.Builder(this)
+                .setMessage("确定注销账号吗")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putBoolean(LoginActivity.IS_LOGIN, false);
+                        editor.commit();
+                        finish();
+                    }
+                })
+                .setNegativeButton("取消",null)
+                .create()
+                .show();
+
     }
 }

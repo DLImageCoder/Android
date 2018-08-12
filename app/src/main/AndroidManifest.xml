@@ -34,8 +34,9 @@
             android:name=".RegisterActivity"
             android:theme="@style/FullScreenAppCompat" />
         <activity
-            android:theme="@style/FullScreenAppCompat"
-            android:name=".UserInfoActivity"></activity>
+            android:name=".UserInfoActivity"
+            android:theme="@style/FullScreenAppCompat" />
+        <activity android:name=".TieziDetailActivity"></activity>
     </application>
 
 </manifest>
