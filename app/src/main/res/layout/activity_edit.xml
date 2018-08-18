@@ -6,17 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".EditActivity">
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY" />
 
     <RelativeLayout
         android:id="@+id/rlToolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/alphaBlue"
+        android:background="@color/colorPrimary"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -51,6 +46,14 @@
             android:textColor="@color/white" />
     </RelativeLayout>
 
+    <com.example.dlimagecoder.view.MyImageView
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/rlToolbar"
+        android:id="@+id/image"
+        app:mHeight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -73,8 +76,10 @@
             android:text="保存" />
 
         <Button
+            android:onClick="process"
+            android:id="@+id/btnProcess"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="表情包" />
+            android:text="处理" />
     </LinearLayout>
 </RelativeLayout>

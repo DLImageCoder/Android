@@ -17,14 +17,18 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.adapter.TieziAdapter;
 import com.example.dlimagecoder.base.BaseActivity;
 import com.example.dlimagecoder.common.Constrants;
 import com.example.dlimagecoder.netmodel.NetResult;
 import com.example.dlimagecoder.netmodel.Tiezi;
+import com.example.dlimagecoder.netmodel.UserInfo;
+import com.example.dlimagecoder.netmodel.UserInfoResult;
 import com.example.dlimagecoder.util.NetUtil;
 import com.example.dlimagecoder.util.Tool;
 
@@ -39,11 +43,13 @@ public class MainActivity extends BaseActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private RelativeLayout loadingMoreRL;
     private RecyclerView rv;
+    private ImageView ivHead;
 
     private final int REQUEST_PER = 1;
     private boolean loading = false;
     private List<Tiezi> list;
     private TieziAdapter adapter;
+    private UserInfo userInfo;
     private boolean end = false;//没有更多数据了
 
 
@@ -77,6 +83,7 @@ public class MainActivity extends BaseActivity {
         cameraBtn=findViewById(R.id.btn_camera);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         loadingMoreRL = findViewById(R.id.rl_loading);
+        ivHead = findViewById(R.id.ivHead);
         rv = findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(adapter);
@@ -85,6 +92,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initEvent() {
         checkMPermission();
+
+        requestUserInfo();
 
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,16 +167,19 @@ public class MainActivity extends BaseActivity {
                         .subscribe(new Action1<NetResult>() {
                             @Override
                             public void call(NetResult netResult) {
-                                // TODO:
-                                List<Tiezi> list1 = new ArrayList<>();
-                                list.clear();
-                                list.addAll(list1);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                });
+                                if (netResult.isSuccessful()){
+                                    // TODO:
+                                    List<Tiezi> list1 = new ArrayList<>();
+                                    list.clear();
+                                    list.addAll(list1);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            adapter.notifyDataSetChanged();
+                                            swipeRefreshLayout.setRefreshing(false);
+                                        }
+                                    });
+                                }
                             }
                         });
             }
@@ -209,7 +221,7 @@ public class MainActivity extends BaseActivity {
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences preferences = getSharedPreferences("user",Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putBoolean(LoginActivity.IS_LOGIN, false);
                         editor.commit();
@@ -220,5 +232,37 @@ public class MainActivity extends BaseActivity {
                 .create()
                 .show();
 
+    }
+
+    //加载个人信息
+    public void requestUserInfo(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                   NetUtil.getAppUrl().getUsrInfo(NetUtil.id)
+                           .subscribe(new Action1<UserInfoResult>() {
+                               @Override
+                               public void call(UserInfoResult userInfoResult) {
+                                    if (userInfoResult.isSuccessful()){
+                                        userInfo = userInfoResult.getUserInfo();
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Glide.with(MainActivity.this)
+                                                        .load(userInfo.getHead())
+                                                        .into(ivHead);
+                                            }
+                                        });
+                                    }
+                               }
+                           });
+            }
+        }).start();
+    }
+
+    public void head(View v){
+        Intent intent = new Intent(this,UserInfoActivity.class);
+        intent.putExtra("info",userInfo);
+        startActivity(intent);
     }
 }

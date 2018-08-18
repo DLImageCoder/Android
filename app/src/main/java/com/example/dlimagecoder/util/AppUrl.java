@@ -1,6 +1,8 @@
 package com.example.dlimagecoder.util;
 
+import com.example.dlimagecoder.netmodel.ImgProcessResult;
 import com.example.dlimagecoder.netmodel.NetResult;
+import com.example.dlimagecoder.netmodel.UserInfoResult;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Field;
@@ -20,6 +22,11 @@ public interface AppUrl {
     @GET("user/register.jsp")
     Observable<NetResult> register(@Query("userId") String userId, @Query("userPwd") String userPwd);
 
+    //获取个人信息
+    @GET("/user/ getInfo")
+    Observable<UserInfoResult> getUsrInfo(@Query("userId") String userId);
+
+
     //提交个人信息
     @GET("user/setInfo")
     Observable<NetResult> setInfo
@@ -38,4 +45,9 @@ public interface AppUrl {
     Observable<NetResult> getTiezi
     (@Query("userId") int userId, @Query("page") int page);
 
+
+    //处理图片
+    @GET("img/imgProcess")
+    Observable<ImgProcessResult> processImg
+    (@Query("url") String url, @Query("type") int type);
 }

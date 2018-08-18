@@ -7,7 +7,7 @@ public class NetResult {
         this.status = status;
     }
 
-    private static final int SUCCESSFUL = 1;
+    public static final int SUCCESSFUL = 1;
 
     public String getStatus() {
         return status;

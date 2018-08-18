@@ -10,14 +10,16 @@
         android:id="@+id/toolbar"
         layout="@layout/background_color"/>
 
-    <TextView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:text="社区"
+        android:onClick="head"
         android:textColor="#fff"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="5dp"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
         android:textSize="20sp"
-        android:layout_height="wrap_content" />
+        android:src="@drawable/head"
+        android:layout_height="30dp" />
 
     <TextView
         android:id="@+id/tv_block"

@@ -2,15 +2,22 @@ package com.example.dlimagecoder;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.base.BaseActivity;
+import com.example.dlimagecoder.netmodel.ImgProcessResult;
+import com.example.dlimagecoder.netmodel.NetResult;
+import com.example.dlimagecoder.util.NetUtil;
+import com.example.dlimagecoder.util.PictureUtil;
 import com.example.dlimagecoder.util.ToastUtil;
 import com.example.dlimagecoder.util.Tool;
 
 import java.util.List;
+
+import rx.functions.Action1;
 
 public class EditActivity extends BaseActivity {
 
@@ -64,6 +71,49 @@ public class EditActivity extends BaseActivity {
         intent.putExtra(CameraActivity.IMAGES,Tool.imagesToString(images));
         setResult(RESULT_OK,intent);
         finish();
+    }
+
+    public void process(View v){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String s = NetUtil.uploadImage(currentImagePath);
+                Log.v("zy","路径"+s);
+//                final String s = PictureUtil.centerSquareScaleBitmap(currentImagePath,256);
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Glide.with(EditActivity.this).load(s).into(image);
+//                    }
+//                });
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String s = NetUtil.uploadImage(currentImagePath);
+                NetUtil.getAppUrl().processImg(s,1)
+                        .subscribe(new Action1<ImgProcessResult>() {
+                            @Override
+                            public void call(final ImgProcessResult netResult) {
+                                if (netResult.isSuccessful()){
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ToastUtil.showToast("处理成功");
+                                            Glide.with(EditActivity.this)
+                                                    .load(netResult.getUrl())
+                                                    .into(image);
+                                        }
+                                    });
+                                } else {
+                                    ToastUtil.showToast("处理失败");
+                                }
+                            }
+                        });
+            }
+        });
+//                .start();
     }
 
 }

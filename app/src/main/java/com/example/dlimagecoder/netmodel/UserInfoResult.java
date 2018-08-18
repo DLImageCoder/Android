@@ -1,5 +1,7 @@
 package com.example.dlimagecoder.netmodel;
 
+import static com.example.dlimagecoder.netmodel.NetResult.SUCCESSFUL;
+
 public class UserInfoResult {
     private String status;
     private UserInfo userInfo;
@@ -24,4 +26,9 @@ public class UserInfoResult {
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
     }
+
+    public boolean isSuccessful(){
+        return Integer.parseInt(status) == SUCCESSFUL ;
+    }
+
 }

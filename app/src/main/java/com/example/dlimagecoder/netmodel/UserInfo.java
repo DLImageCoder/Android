@@ -1,6 +1,8 @@
 package com.example.dlimagecoder.netmodel;
 
-public class UserInfo {
+import java.io.Serializable;
+
+public class UserInfo implements Serializable{
     private int userId;
     private String name;
     private int age;

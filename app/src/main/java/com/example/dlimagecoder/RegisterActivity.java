@@ -30,7 +30,7 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initVariable() {
-        preferences = getPreferences(Context.MODE_PRIVATE);
+        preferences = getSharedPreferences("user",Context.MODE_PRIVATE);
     }
 
     @Override
