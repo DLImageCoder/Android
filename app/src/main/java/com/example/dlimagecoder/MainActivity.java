@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -30,6 +31,7 @@ import com.example.dlimagecoder.netmodel.Tiezi;
 import com.example.dlimagecoder.netmodel.UserInfo;
 import com.example.dlimagecoder.netmodel.UserInfoResult;
 import com.example.dlimagecoder.util.NetUtil;
+import com.example.dlimagecoder.util.ToastUtil;
 import com.example.dlimagecoder.util.Tool;
 
 import java.util.ArrayList;
@@ -51,6 +53,9 @@ public class MainActivity extends BaseActivity {
     private TieziAdapter adapter;
     private UserInfo userInfo;
     private boolean end = false;//没有更多数据了
+    private static final int PAGE_SIZE = 5;
+
+    private boolean quit = false;
 
 
     @Override
@@ -93,7 +98,16 @@ public class MainActivity extends BaseActivity {
     protected void initEvent() {
         checkMPermission();
 
-        //requestUserInfo();
+        try {
+            requestUserInfo();
+        } catch (Exception e){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ToastUtil.showToast("网络故障");
+                }
+            });
+        }
 
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,58 +144,86 @@ public class MainActivity extends BaseActivity {
 
     //底部加载
     private void loadMore() {
-        if (list.isEmpty()){
+        if (list.isEmpty()||end){
             return;
         }
         loadingMoreRL.setVisibility(View.VISIBLE);
+        loading = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),list.get(list.size()-1).getId())
-                        .subscribe(new Action1<NetResult>() {
-                            @Override
-                            public void call(NetResult netResult) {
-                                // TODO:
-                                List<Tiezi> list1 = new ArrayList<>();
-                                final int start = list.size();
-                                list.addAll(list1);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        loadingMoreRL.setVisibility(View.GONE);
-                                        adapter.notifyItemRangeChanged(start,list.size()-1);
+                try {
+                    NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),list.get(list.size()-1).getId())
+                            .subscribe(new Action1<NetResult>() {
+                                @Override
+                                public void call(NetResult netResult) {
+                                    // TODO:
+                                    List<Tiezi> list1 = new ArrayList<>();
+                                    final int start = list.size();
+                                    list.addAll(list1);
+                                    if (list1.size()<PAGE_SIZE){
+                                        end = true;
                                     }
-                                });
-                            }
-                        });
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            loadingMoreRL.setVisibility(View.GONE);
+                                            adapter.notifyItemRangeChanged(start,list.size()-1);
+                                        }
+                                    });
+                                }
+                            });
+                    loading = false;
+                } catch (Exception e){
+                    loading = false;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.showToast("网络故障");
+                        }
+                    });
+                }
             }
         }).start();
     }
 
     //更新列表
     private void refresh() {
+        end = false;
+        loading = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),-1)
-                        .subscribe(new Action1<NetResult>() {
-                            @Override
-                            public void call(NetResult netResult) {
-                                if (netResult.isSuccessful()){
-                                    // TODO:
-                                    List<Tiezi> list1 = new ArrayList<>();
-                                    list.clear();
-                                    list.addAll(list1);
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            adapter.notifyDataSetChanged();
-                                            swipeRefreshLayout.setRefreshing(false);
-                                        }
-                                    });
+                try {
+                    NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),-1)
+                            .subscribe(new Action1<NetResult>() {
+                                @Override
+                                public void call(NetResult netResult) {
+                                    if (netResult.isSuccessful()){
+                                        // TODO:
+                                        List<Tiezi> list1 = new ArrayList<>();
+                                        list.clear();
+                                        list.addAll(list1);
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                adapter.notifyDataSetChanged();
+                                                swipeRefreshLayout.setRefreshing(false);
+                                            }
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                    loading = false;
+                } catch (Exception e){
+                    loading = false;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.showToast("网络故障");
+                        }
+                    });
+                }
             }
         }).start();
     }
@@ -264,5 +306,22 @@ public class MainActivity extends BaseActivity {
         Intent intent = new Intent(this,UserInfoActivity.class);
         intent.putExtra("info",userInfo);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (quit){
+            super.onBackPressed();
+            return;
+        } else {
+            quit = true;
+            ToastUtil.showToast("再按一次退出");
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                quit = false;
+            }
+        },2000);
     }
 }

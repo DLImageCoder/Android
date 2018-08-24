@@ -42,6 +42,9 @@
     <Button
         android:id="@+id/btn_login"
         android:text="登录"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        style="@null"
         android:layout_below="@id/b"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

@@ -73,7 +73,16 @@ public class LoginActivity extends BaseActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            login(listener);
+                            try {
+                                login(listener);
+                            } catch (Exception e){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ToastUtil.showToast("网络故障");
+                                    }
+                                });
+                            }
                         }
                     }).start();
                 }

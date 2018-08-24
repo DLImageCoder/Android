@@ -46,7 +46,8 @@ public class EditActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        Glide.with(this).load(currentImagePath).into(image);
+        if (currentImagePath!=null)
+            Glide.with(this).load(currentImagePath).into(image);
 
     }
 
@@ -66,6 +67,10 @@ public class EditActivity extends BaseActivity {
 
     //下一张
     public void nextImage(View v){
+        if (images.size()>=2){
+            ToastUtil.showToast("最多三张");
+            return;
+        }
         images.add(currentImagePath);
         Intent intent = new Intent();
         intent.putExtra(CameraActivity.IMAGES,Tool.imagesToString(images));
@@ -119,4 +124,9 @@ public class EditActivity extends BaseActivity {
     public void back(View v){
         onBackPressed();
     }
+
+    public void store(View v){
+        ToastUtil.showToast("照片已保存到："+currentImagePath);
+    }
+
 }

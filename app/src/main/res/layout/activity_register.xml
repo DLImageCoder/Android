@@ -40,6 +40,9 @@
     </android.support.design.widget.TextInputLayout>
 
     <Button
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        style="@null"
         android:onClick="register"
         android:id="@+id/btn_register"
         android:text="注册"

@@ -30,6 +30,9 @@ public class CameraActivity extends BaseActivity {
     private Camera camera;
     private List<String> images;//已经处理完的图片
 
+    private int camId;
+    private SurfaceHolder mHolder;
+
     public final static String IMAGE_PATH = "image_path";
     public final static String IMAGES = "images";
     private final static int EDIT = 21;
@@ -66,6 +69,7 @@ public class CameraActivity extends BaseActivity {
     private class TakePictureSurfaceCallback implements SurfaceHolder.Callback {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
+            mHolder = surfaceHolder;
             camera = Camera.open();
             try {
                 camera.setPreviewDisplay(surfaceHolder);//绑定
@@ -74,11 +78,12 @@ public class CameraActivity extends BaseActivity {
             }
             Camera.Parameters params = camera.getParameters();
             params.setJpegQuality(100);//照片质量
-            params.setPictureSize(1080, 1920);//图片分辨率
+            //params.setPictureSize(1080, 1920);//图片分辨率
             params.setPreviewFrameRate(5);//预览帧率
 
             camera.setDisplayOrientation(90);
             camera.startPreview();
+            camId = Camera.CameraInfo.CAMERA_FACING_BACK;
         }
 
         @Override
@@ -135,23 +140,26 @@ public class CameraActivity extends BaseActivity {
     }
 
     public void switchCam(View v){
-        camera = Camera.open(1);
+        camera.stopPreview();
+        camera.release();
+
+        camId = 1 - camId;
+        camera = Camera.open(camId);
         try {
-            camera.setPreviewDisplay(sv.getHolder());//绑定
+            camera.setPreviewDisplay(mHolder);
         } catch (IOException e) {
             e.printStackTrace();
         }
         Camera.Parameters params = camera.getParameters();
         params.setJpegQuality(100);//照片质量
-        params.setPictureSize(1080, 1920);//图片分辨率
+        //params.setPictureSize(1080, 1920);//图片分辨率
         params.setPreviewFrameRate(5);//预览帧率
 
         camera.setDisplayOrientation(90);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //camera.startPreview();
-            }
-        }).start();
+        camera.startPreview();
+    }
+
+    public void back(View v){
+        onBackPressed();
     }
 }

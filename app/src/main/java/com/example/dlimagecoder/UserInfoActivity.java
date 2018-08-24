@@ -69,23 +69,32 @@ public class UserInfoActivity extends BaseActivity {
                 if (head!=null){
                     head  = NetUtil.uploadImage(head);
                 }
-                NetUtil.getAppUrl().setInfo(NetUtil.id,name,age,"男",head)
-                        .subscribe(new Action1<NetResult>() {
-                            @Override
-                            public void call(NetResult netResult) {
-                                if (netResult.isSuccessful()){
-                                    startActivity(new Intent(UserInfoActivity.this,MainActivity.class));
-                                    finish();
-                                } else {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            ToastUtil.showToast("提交失败");
-                                        }
-                                    });
+                try {
+                    NetUtil.getAppUrl().setInfo(NetUtil.id,name,age,"男",head)
+                            .subscribe(new Action1<NetResult>() {
+                                @Override
+                                public void call(NetResult netResult) {
+                                    if (netResult.isSuccessful()){
+                                        startActivity(new Intent(UserInfoActivity.this,MainActivity.class));
+                                        finish();
+                                    } else {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                ToastUtil.showToast("提交失败");
+                                            }
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                } catch (Exception e){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.showToast("网络故障");
+                        }
+                    });
+                }
             }
         }).start();
     }

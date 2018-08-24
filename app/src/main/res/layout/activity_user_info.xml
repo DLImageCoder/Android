@@ -51,6 +51,9 @@
     </android.support.design.widget.TextInputLayout>
 
     <Button
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        style="@null"
         android:onClick="post"
         android:id="@+id/btn_post"
         android:text="提交信息"

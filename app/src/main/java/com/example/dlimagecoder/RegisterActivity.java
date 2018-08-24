@@ -53,16 +53,25 @@ public class RegisterActivity extends BaseActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    NetUtil.getAppUrl().register(id,pwd).subscribe(new Action1<NetResult>() {
-                        @Override
-                        public void call(NetResult netResult) {
-                            if (netResult.isSuccessful()){
-                                storeAccount();
-                                startActivity(new Intent(RegisterActivity.this,UserInfoActivity.class));
-                                finish();
+                    try {
+                        NetUtil.getAppUrl().register(id,pwd).subscribe(new Action1<NetResult>() {
+                            @Override
+                            public void call(NetResult netResult) {
+                                if (netResult.isSuccessful()){
+                                    storeAccount();
+                                    startActivity(new Intent(RegisterActivity.this,UserInfoActivity.class));
+                                    finish();
+                                }
                             }
-                        }
-                    });
+                        });
+                    } catch (Exception e){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ToastUtil.showToast("网络故障");
+                            }
+                        });
+                    }
                 }
             }).start();
         }

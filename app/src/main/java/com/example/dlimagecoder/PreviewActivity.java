@@ -2,6 +2,7 @@ package com.example.dlimagecoder;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -125,5 +126,21 @@ public class PreviewActivity extends BaseActivity {
 
     public void back(View v){
         onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setMessage("确定要放弃编辑吗？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create()
+                .show();
+       // super.onBackPressed();
     }
 }
