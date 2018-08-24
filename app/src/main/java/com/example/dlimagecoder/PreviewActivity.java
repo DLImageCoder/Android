@@ -123,5 +123,7 @@ public class PreviewActivity extends BaseActivity {
         }).start();
     }
 
-
+    public void back(View v){
+        onBackPressed();
+    }
 }

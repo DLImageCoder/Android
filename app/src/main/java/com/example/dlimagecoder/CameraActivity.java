@@ -133,4 +133,25 @@ public class CameraActivity extends BaseActivity {
             }
         }
     }
+
+    public void switchCam(View v){
+        camera = Camera.open(1);
+        try {
+            camera.setPreviewDisplay(sv.getHolder());//绑定
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Camera.Parameters params = camera.getParameters();
+        params.setJpegQuality(100);//照片质量
+        params.setPictureSize(1080, 1920);//图片分辨率
+        params.setPreviewFrameRate(5);//预览帧率
+
+        camera.setDisplayOrientation(90);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //camera.startPreview();
+            }
+        }).start();
+    }
 }

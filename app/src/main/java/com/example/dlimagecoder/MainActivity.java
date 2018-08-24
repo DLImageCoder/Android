@@ -93,7 +93,7 @@ public class MainActivity extends BaseActivity {
     protected void initEvent() {
         checkMPermission();
 
-        requestUserInfo();
+        //requestUserInfo();
 
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override

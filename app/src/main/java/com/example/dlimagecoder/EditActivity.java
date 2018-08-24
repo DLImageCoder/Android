@@ -116,4 +116,7 @@ public class EditActivity extends BaseActivity {
 //                .start();
     }
 
+    public void back(View v){
+        onBackPressed();
+    }
 }
