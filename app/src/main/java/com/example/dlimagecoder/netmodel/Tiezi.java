@@ -15,24 +15,39 @@ public class Tiezi implements Serializable{
     private int userId;
     private String text;
     private String time;
-    private String likes;
+    private int likes;//点赞数
+    private int hasLike;
     private String comments;
     private String imgs;
-    private List<String> approUsers;
     private List<String> pics;
     private List<Comment> commentList;
-    private int approNum;//点赞数
     private int commentNum;//评论数
-    private boolean isApproval;
 
-    public Tiezi(int momentId, int userId, String text, String time, String likes, String comment, String imgs) {
+    public Tiezi(int momentId, int userId, String text, String time, int likes, int hasLike, String comments, String imgs) {
         this.momentId = momentId;
         this.userId = userId;
         this.text = text;
         this.time = time;
         this.likes = likes;
-        this.comments = comment;
+        this.hasLike = hasLike;
+        this.comments = comments;
         this.imgs = imgs;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getHasLike() {
+        return hasLike;
+    }
+
+    public void setHasLike(int hasLike) {
+        this.hasLike = hasLike;
     }
 
     public String getTime() {
@@ -44,7 +59,8 @@ public class Tiezi implements Serializable{
     }
 
     public int getCommentNum() {
-        return getCommentList().size();
+        commentNum = getCommentList().size();
+        return commentNum;
     }
 
     public void setCommentNum(int commentNum) {
@@ -80,21 +96,7 @@ public class Tiezi implements Serializable{
         this.userId = userId;
     }
 
-    public boolean isApproval() {
-        return getApproUsers().contains(NetUtil.id);
-    }
 
-    public void setApproval(boolean approval) {
-        isApproval = approval;
-    }
-
-    public String getLikes() {
-        return likes;
-    }
-
-    public void setLikes(String likes) {
-        this.likes = likes;
-    }
 
     public String getImgs() {
         return imgs;
@@ -104,14 +106,6 @@ public class Tiezi implements Serializable{
         this.imgs = imgs;
     }
 
-    public int getApproNum() {
-        approNum = getApproUsers().size();
-        return approNum;
-    }
-
-    public void setApproNum(int approNum) {
-        this.approNum = approNum;
-    }
 
     public String getText() {
         return text;
@@ -121,16 +115,6 @@ public class Tiezi implements Serializable{
         this.text = text;
     }
 
-    public List<String> getApproUsers() {
-        if (approUsers == null){
-            approUsers = Tool.str2List(likes);
-        }
-        return approUsers;
-    }
-
-    public void setApproUsers(List<String> approUsers) {
-        this.approUsers = approUsers;
-    }
 
     public List<String> getPics() {
         if (pics ==null){

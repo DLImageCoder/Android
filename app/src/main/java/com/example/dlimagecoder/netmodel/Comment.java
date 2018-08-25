@@ -5,7 +5,13 @@ import java.io.Serializable;
 public class Comment implements Serializable {
     private String text;
     private String time;
-    private int uid;
+    private String name;
+
+    public Comment(String text, String time, String name) {
+        this.text = text;
+        this.time = time;
+        this.name = name;
+    }
 
     public String getText() {
         return text;
@@ -23,17 +29,11 @@ public class Comment implements Serializable {
         this.time = time;
     }
 
-    public int getUid() {
-        return uid;
+    public String getName() {
+        return name;
     }
 
-    public void setUid(int uid) {
-        this.uid = uid;
-    }
-
-    public Comment(String text, String time, int uid) {
-        this.text = text;
-        this.time = time;
-        this.uid = uid;
+    public void setName(String name) {
+        this.name = name;
     }
 }

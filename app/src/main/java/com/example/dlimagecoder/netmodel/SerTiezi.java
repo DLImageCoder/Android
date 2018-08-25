@@ -7,18 +7,36 @@ public class SerTiezi implements Serializable {
     private int authorId;
     private String text;
     private String time;
-    private String appro;
+    private int appro;
+    private int hasLike;
     private String comment;
     private String picsText;
 
-    public SerTiezi(int id, int authorId, String text, String time, String appro, String comment, String picsText) {
+    public SerTiezi(int id, int authorId, String text, String time, int appro, int hasLike, String comment, String picsText) {
         this.id = id;
         this.authorId = authorId;
         this.text = text;
         this.time = time;
         this.appro = appro;
+        this.hasLike = hasLike;
         this.comment = comment;
         this.picsText = picsText;
+    }
+
+    public int getAppro() {
+        return appro;
+    }
+
+    public void setAppro(int appro) {
+        this.appro = appro;
+    }
+
+    public int getHasLike() {
+        return hasLike;
+    }
+
+    public void setHasLike(int hasLike) {
+        this.hasLike = hasLike;
     }
 
     public String getTime() {
@@ -53,13 +71,6 @@ public class SerTiezi implements Serializable {
         this.text = text;
     }
 
-    public String getAppro() {
-        return appro;
-    }
-
-    public void setAppro(String appro) {
-        this.appro = appro;
-    }
 
     public String getComment() {
         return comment;

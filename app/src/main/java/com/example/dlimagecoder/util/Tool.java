@@ -46,11 +46,11 @@ public class Tool {
 
     public static SerTiezi geneTiezi(Tiezi tiezi){
         return new SerTiezi(tiezi.getMomentId(),tiezi.getUserId(),tiezi.getText(),
-                tiezi.getTime(),tiezi.getLikes(),tiezi.getComments(),tiezi.getImgs());
+                tiezi.getTime(),tiezi.getLikes(),tiezi.getHasLike(),tiezi.getComments(),tiezi.getImgs());
     }
 
     public static Tiezi getTiezi(SerTiezi tiezi){
         return new Tiezi(tiezi.getId(),tiezi.getAuthorId(),tiezi.getText(),
-                tiezi.getTime(),tiezi.getAppro(),tiezi.getComment(),tiezi.getPicsText());
+                tiezi.getTime(),tiezi.getAppro(),tiezi.getHasLike(),tiezi.getComment(),tiezi.getPicsText());
     }
 }

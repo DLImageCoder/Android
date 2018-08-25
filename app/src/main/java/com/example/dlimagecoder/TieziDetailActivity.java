@@ -65,7 +65,7 @@ public class TieziDetailActivity extends BaseActivity {
         tvContent.setText(tiezi.getText());
         StringBuilder comment = new StringBuilder();
         for (Comment c:tiezi.getCommentList()){
-            comment.append(c.getUid()+" : "+c.getText()+"     "+c.getTime()+"\n");
+            comment.append(c.getName()+" : "+c.getText()+"          "+c.getTime()+"\n");
         }
         tvComment.setText(comment);
         tvTime.setText(tiezi.getTime());
@@ -79,7 +79,8 @@ public class TieziDetailActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Glide.with(TieziDetailActivity.this).load(info.getHead()).into(ivHead);
+                        if (!TextUtils.isEmpty(info.getHead()))
+                             Glide.with(TieziDetailActivity.this).load(info.getHead()).into(ivHead);
                         tvName.setText(info.getName());
                     }
                 });
@@ -98,7 +99,7 @@ public class TieziDetailActivity extends BaseActivity {
 
     public void commentAppend(){
         String str = et.getText().toString();
-        String s = "昵称"+" : "+str+"     "+"刚刚"+"\n";
+        String s = "我"+" : "+str+"          "+"刚刚"+"\n";
         tvComment.append(s);
     }
 

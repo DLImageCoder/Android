@@ -109,14 +109,14 @@ public class TieziAdapter extends RecyclerView.Adapter<TieziAdapter.MyViewHolder
                 break;
         }
         //点赞和评论
-        holder.tvApproval.setText(""+item.getApproNum());
+        holder.tvApproval.setText(""+item.getLikes());
         holder.tvComment.setText(""+item.getCommentNum());
-        if (item.isApproval()) {
+        if (item.getHasLike()==1) {
             holder.ivApproval.setBackgroundResource(R.drawable.zan_press);
         } else {
             holder.ivApproval.setBackgroundResource(R.drawable.zan);
         }
-        final int type = item.isApproval()? 1:0;
+        final int type = item.getHasLike();
         holder.ivApproval.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,14 +131,16 @@ public class TieziAdapter extends RecyclerView.Adapter<TieziAdapter.MyViewHolder
                                             @Override
                                             public void run() {
                                                 if (imgProcessResult.isSuccessful()) {
-                                                    if (!item.isApproval()){
-                                                        item.getApproUsers().add(NetUtil.id);
+                                                    if (item.getHasLike()==0){
+                                                        item.setHasLike(1);
+                                                        item.setLikes(item.getLikes()+1);
                                                         holder.ivApproval.setBackgroundResource(R.drawable.zan_press);
-                                                        holder.tvApproval.setText(""+(item.getApproNum()));
+                                                        holder.tvApproval.setText(""+(item.getLikes()));
                                                     } else {
-                                                        item.getApproUsers().remove(NetUtil.id);
+                                                        item.setHasLike(0);
+                                                        item.setLikes(item.getLikes()-1);
                                                         holder.ivApproval.setBackgroundResource(R.drawable.zan);
-                                                        holder.tvApproval.setText(""+(item.getApproNum()));
+                                                        holder.tvApproval.setText(""+(item.getLikes()));
                                                     }
                                                 } else {
                                                     ToastUtil.showToast("点赞失败");
@@ -157,8 +159,9 @@ public class TieziAdapter extends RecyclerView.Adapter<TieziAdapter.MyViewHolder
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (!TextUtils.isEmpty(info.getHead()))
+                        if (!TextUtils.isEmpty(info.getHead())){
                             Glide.with(context).load(info.getHead()).into(holder.ivHead);
+                        }
                         holder.tvName.setText(info.getName());
                     }
                 });
