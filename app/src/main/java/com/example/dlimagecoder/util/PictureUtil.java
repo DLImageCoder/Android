@@ -7,14 +7,18 @@ import android.graphics.Matrix;
 public class PictureUtil {
 
     //旋转图片
-    public static Bitmap rotateToDegrees(Bitmap tmpBitmap, float degrees) {
+    public static Bitmap rotateToDegrees(Bitmap tmpBitmap, float degrees,boolean mirror) {
         Matrix matrix = new Matrix();
         matrix.reset();
         matrix.setRotate(degrees);
+        if (mirror){
+            matrix.postScale(-1,1);
+        }
         return tmpBitmap =
                 Bitmap.createBitmap(tmpBitmap, 0, 0, tmpBitmap.getWidth(), tmpBitmap.getHeight(), matrix,
                         true);
     }
+
 
     //将图片重绘成固定大小的图片
     public static String resizeImg(String path,int toWidth,int toHeight){

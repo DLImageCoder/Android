@@ -12,6 +12,7 @@
         android:layout_height="match_parent" />
 
     <Button
+        android:layout_marginTop="20dp"
         android:onClick="back"
         android:id="@+id/btn_back"
         android:layout_width="24dp"

@@ -42,7 +42,7 @@
     <Button
         android:textColor="@color/white"
         android:textSize="20sp"
-        style="@null"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:onClick="register"
         android:id="@+id/btn_register"
         android:text="注册"

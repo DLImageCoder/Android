@@ -2,6 +2,7 @@ package com.example.dlimagecoder.util;
 
 import com.example.dlimagecoder.netmodel.ImgProcessResult;
 import com.example.dlimagecoder.netmodel.NetResult;
+import com.example.dlimagecoder.netmodel.TieziResult;
 import com.example.dlimagecoder.netmodel.UserInfoResult;
 
 import okhttp3.ResponseBody;
@@ -23,7 +24,7 @@ public interface AppUrl {
     Observable<NetResult> register(@Query("userId") String userId, @Query("userPwd") String userPwd);
 
     //获取个人信息
-    @GET("/user/ getInfo")
+    @GET("/user/getInfo")
     Observable<UserInfoResult> getUsrInfo(@Query("userId") String userId);
 
 
@@ -37,17 +38,28 @@ public interface AppUrl {
     //发帖
     @FormUrlEncoded
     @POST("moment/sendMoment")
-    Observable<NetResult> post(@Field("userId") int userId,
+    Observable<NetResult> post(@Field("userId") String userId,
                                     @Field("text") String text, @Field("imgs") String imgs);
 
     //获取帖子,page其实是当前帖子的最小id
     @GET("moment/getMoment")
-    Observable<NetResult> getTiezi
-    (@Query("userId") int userId, @Query("page") int page);
+    Observable<TieziResult> getTiezi
+    (@Query("mid") int mid);
 
 
     //处理图片
     @GET("img/imgProcess")
     Observable<ImgProcessResult> processImg
     (@Query("url") String url, @Query("type") int type);
+
+    //点赞
+    @GET("moment/like")
+    Observable<NetResult> approval
+    (@Query("momentId") int commentId, @Query("userId") int userId,@Query("type") int type);
+
+    //评论
+    @GET("moment/comment")
+    Observable<NetResult> comment
+    (@Query("momentId") int momentId, @Query("text") String text,@Query("userId") int userId,@Query("type") int type);
+
 }

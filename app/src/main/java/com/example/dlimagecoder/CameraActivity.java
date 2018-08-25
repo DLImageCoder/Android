@@ -16,8 +16,6 @@ import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.entity.LocalMedia;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +116,7 @@ public class CameraActivity extends BaseActivity {
                     startActivityForResult(intent,EDIT);
                     break;
                 case EDIT:
-                    images = Tool.getImagesFromString(data.getStringExtra(IMAGES));
+                    images = Tool.str2List(data.getStringExtra(IMAGES));
                     break;
             }
         }
@@ -129,8 +127,13 @@ public class CameraActivity extends BaseActivity {
         public void onPictureTaken(byte[] data, Camera camera) {
             //ByteArrayOutputStream os = new ByteArrayOutputStream(data.length);
             //byte[] tempData = os.toByteArray();
+            Bitmap bitmap;
             if (data != null && data.length > 0) {
-                Bitmap bitmap = PictureUtil.rotateToDegrees(BitmapFactory.decodeByteArray(data, 0, data.length),90);
+                if (camId == Camera.CameraInfo.CAMERA_FACING_FRONT){
+                    bitmap = PictureUtil.rotateToDegrees(BitmapFactory.decodeByteArray(data, 0, data.length),270,true);
+                } else {
+                    bitmap = PictureUtil.rotateToDegrees(BitmapFactory.decodeByteArray(data, 0, data.length),90,false);
+                }
                 Intent intent  = new Intent(CameraActivity.this,EditActivity.class);
                 intent.putExtra(IMAGE_PATH, FileUtil.storeImage(bitmap));
                 intent.putExtra(IMAGES, Tool.imagesToString(images));

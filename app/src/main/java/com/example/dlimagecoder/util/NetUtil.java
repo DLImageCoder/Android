@@ -4,6 +4,8 @@ import android.app.Application;
 import android.util.Log;
 
 import com.example.dlimagecoder.common.Constrants;
+import com.example.dlimagecoder.lisenter.UserInfoLisenter;
+import com.example.dlimagecoder.netmodel.UserInfoResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.qiniu.common.QiniuException;
@@ -23,6 +25,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import rx.functions.Action1;
 
 public class NetUtil {
 
@@ -88,5 +91,24 @@ public class NetUtil {
     public static String urlFromJson(String s) throws JSONException {
         JSONObject jsonObject = new JSONObject(s);
         return IMAGE_HOST+jsonObject.get("key").toString();
+    }
+
+    public static void getUserInfo(final String id, final UserInfoLisenter lisenter){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getAppUrl().getUsrInfo(id)
+                        .subscribe(new Action1<UserInfoResult>() {
+                            @Override
+                            public void call(UserInfoResult userInfoResult) {
+                                if (userInfoResult.isSuccessful()){
+                                    lisenter.process(userInfoResult.getUserInfo());
+                                } else {
+                                    lisenter.fail();
+                                }
+                            }
+                        });
+            }
+        }).start();
     }
 }

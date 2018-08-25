@@ -39,11 +39,6 @@ public class UserInfoActivity extends BaseActivity {
     @Override
     protected void initVariable() {
         userInfo = (UserInfo) getIntent().getSerializableExtra("info");
-        if (userInfo!=null){
-            Glide.with(this).load(userInfo.getHead()).into(headIv);
-            nameEt.setText(userInfo.getName());
-            ageEt.setText(userInfo.getAge());
-        }
     }
 
     @Override
@@ -52,6 +47,14 @@ public class UserInfoActivity extends BaseActivity {
         ageEt = findViewById(R.id.et_age);
 
         headIv = findViewById(R.id.ivHead);
+
+        if (userInfo!=null){
+            if (userInfo.getHead()!=null){
+                Glide.with(this).load(userInfo.getHead()).into(headIv);
+            }
+            nameEt.setText(userInfo.getName());
+            ageEt.setText(""+userInfo.getAge());
+        }
     }
 
     @Override

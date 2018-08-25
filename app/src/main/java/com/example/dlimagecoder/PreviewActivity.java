@@ -12,17 +12,10 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.base.BaseActivity;
-import com.example.dlimagecoder.common.Constrants;
 import com.example.dlimagecoder.netmodel.NetResult;
 import com.example.dlimagecoder.util.NetUtil;
 import com.example.dlimagecoder.util.ToastUtil;
 import com.example.dlimagecoder.util.Tool;
-import com.qiniu.common.QiniuException;
-import com.qiniu.common.Zone;
-import com.qiniu.http.Response;
-import com.qiniu.storage.Configuration;
-import com.qiniu.storage.UploadManager;
-import com.qiniu.util.Auth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +51,7 @@ public class PreviewActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        List<String> paths = Tool.getImagesFromString(images);
+        List<String> paths = Tool.str2List(images);
         ImageView[] imageViews = {image1,image2,image3};
         if (!paths.isEmpty()){
             for (int i=0;i<paths.size();i++){
@@ -75,7 +68,7 @@ public class PreviewActivity extends BaseActivity {
         dialog.setMessage("上传中");
         dialog.setCancelable(false);
         dialog.show();
-        List<String> paths = Tool.getImagesFromString(images);
+        List<String> paths = Tool.str2List(images);
         uploadImages = paths.size();
         final List<String> imageUrls = new ArrayList<>();
         for (String path : paths){
@@ -100,7 +93,7 @@ public class PreviewActivity extends BaseActivity {
                         e.printStackTrace();
                     }
                 }
-                NetUtil.getAppUrl().post(Integer.parseInt(NetUtil.id),Tool.UTF8(text),Tool.imagesToString(imageUrls))
+                NetUtil.getAppUrl().post(NetUtil.id,text,Tool.imagesToString(imageUrls))
                         .subscribe(new Action1<NetResult>() {
                             @Override
                             public void call(final NetResult netResult) {

@@ -13,8 +13,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -25,9 +23,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.adapter.TieziAdapter;
 import com.example.dlimagecoder.base.BaseActivity;
-import com.example.dlimagecoder.common.Constrants;
-import com.example.dlimagecoder.netmodel.NetResult;
 import com.example.dlimagecoder.netmodel.Tiezi;
+import com.example.dlimagecoder.netmodel.TieziResult;
 import com.example.dlimagecoder.netmodel.UserInfo;
 import com.example.dlimagecoder.netmodel.UserInfoResult;
 import com.example.dlimagecoder.util.NetUtil;
@@ -35,6 +32,7 @@ import com.example.dlimagecoder.util.ToastUtil;
 import com.example.dlimagecoder.util.Tool;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rx.functions.Action1;
@@ -66,13 +64,13 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initVariable() {
         list = new ArrayList<>();
-        adapter = new TieziAdapter(this,list);
+        adapter = new TieziAdapter(this, list, new Handler());
         adapter.setLisenter(new TieziAdapter.OnItenClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Tiezi tiezi = list.get(position);
-                Intent intent = new Intent(MainActivity.this,TieziDetailActivity.class);
-                intent.putExtra("tiezi",tiezi);
+                Intent intent = new Intent(MainActivity.this, TieziDetailActivity.class);
+                intent.putExtra("tiezi", Tool.geneTiezi(tiezi));
                 startActivity(intent);
             }
 
@@ -85,7 +83,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        cameraBtn=findViewById(R.id.btn_camera);
+        cameraBtn = findViewById(R.id.btn_camera);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         loadingMoreRL = findViewById(R.id.rl_loading);
         ivHead = findViewById(R.id.ivHead);
@@ -98,21 +96,12 @@ public class MainActivity extends BaseActivity {
     protected void initEvent() {
         checkMPermission();
 
-        try {
-            requestUserInfo();
-        } catch (Exception e){
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ToastUtil.showToast("网络故障");
-                }
-            });
-        }
+        refresh();
 
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,CameraActivity.class));
+                startActivity(new Intent(MainActivity.this, CameraActivity.class));
             }
         });
 
@@ -132,10 +121,10 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (loading){//防止同时多次调用
+                if (loading) {//防止同时多次调用
                     return;
                 }
-                if (Tool.isSlideToBottom(recyclerView)&&!end) {
+                if (Tool.isSlideToBottom(recyclerView)) {
                     loadMore();
                 }
             }
@@ -144,7 +133,8 @@ public class MainActivity extends BaseActivity {
 
     //底部加载
     private void loadMore() {
-        if (list.isEmpty()||end){
+        if (list.isEmpty() || end) {
+            ToastUtil.showToast("已经到底了");
             return;
         }
         loadingMoreRL.setVisibility(View.VISIBLE);
@@ -153,28 +143,28 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 try {
-                    NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),list.get(list.size()-1).getId())
-                            .subscribe(new Action1<NetResult>() {
+                    NetUtil.getAppUrl().getTiezi(list.get(list.size() - 1).getMomentId())
+                            .subscribe(new Action1<TieziResult>() {
                                 @Override
-                                public void call(NetResult netResult) {
+                                public void call(TieziResult netResult) {
                                     // TODO:
-                                    List<Tiezi> list1 = new ArrayList<>();
+                                    List<Tiezi> list1 = netResult.getMoments();
                                     final int start = list.size();
                                     list.addAll(list1);
-                                    if (list1.size()<PAGE_SIZE){
+                                    if (list1.size() < PAGE_SIZE) {
                                         end = true;
                                     }
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             loadingMoreRL.setVisibility(View.GONE);
-                                            adapter.notifyItemRangeChanged(start,list.size()-1);
+                                            adapter.notifyItemRangeChanged(start, list.size() - 1);
                                         }
                                     });
                                 }
                             });
                     loading = false;
-                } catch (Exception e){
+                } catch (Exception e) {
                     loading = false;
                     runOnUiThread(new Runnable() {
                         @Override
@@ -195,13 +185,13 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 try {
-                    NetUtil.getAppUrl().getTiezi(Integer.parseInt(Constrants.ID),-1)
-                            .subscribe(new Action1<NetResult>() {
+                    NetUtil.getAppUrl().getTiezi(-1)
+                            .subscribe(new Action1<TieziResult>() {
                                 @Override
-                                public void call(NetResult netResult) {
-                                    if (netResult.isSuccessful()){
+                                public void call(TieziResult netResult) {
+                                    if (netResult.isSuccessful()) {
                                         // TODO:
-                                        List<Tiezi> list1 = new ArrayList<>();
+                                        List<Tiezi> list1 = netResult.getMoments();
                                         list.clear();
                                         list.addAll(list1);
                                         runOnUiThread(new Runnable() {
@@ -215,7 +205,7 @@ public class MainActivity extends BaseActivity {
                                 }
                             });
                     loading = false;
-                } catch (Exception e){
+                } catch (Exception e) {
                     loading = false;
                     runOnUiThread(new Runnable() {
                         @Override
@@ -231,25 +221,25 @@ public class MainActivity extends BaseActivity {
     @TargetApi(Build.VERSION_CODES.M)
     private void checkMPermission() {
         List<String> permissions = new ArrayList<>();
-        if (checkSelfPermission(Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.CAMERA);
         }
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
-        if (!permissions.isEmpty()){
-            requestPermissions(permissions.toArray(new String[permissions.size()]),REQUEST_PER);
+        if (!permissions.isEmpty()) {
+            requestPermissions(permissions.toArray(new String[permissions.size()]), REQUEST_PER);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        for (int permit:grantResults){
-            if (permit!=PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(MainActivity.this,"请同意所有权限",Toast.LENGTH_SHORT).show();
+        for (int permit : grantResults) {
+            if (permit != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "请同意所有权限", Toast.LENGTH_SHORT).show();
                 finish();
                 return;
             }
@@ -257,60 +247,62 @@ public class MainActivity extends BaseActivity {
     }
 
     //注销
-    public void quit(View v){
+    public void quit(View v) {
         new AlertDialog.Builder(this)
                 .setMessage("确定注销账号吗")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        SharedPreferences preferences = getSharedPreferences("user",Context.MODE_PRIVATE);
+                        SharedPreferences preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putBoolean(LoginActivity.IS_LOGIN, false);
                         editor.commit();
                         finish();
                     }
                 })
-                .setNegativeButton("取消",null)
+                .setNegativeButton("取消", null)
                 .create()
                 .show();
 
     }
 
     //加载个人信息
-    public void requestUserInfo(){
+    public void requestUserInfo() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                   NetUtil.getAppUrl().getUsrInfo(NetUtil.id)
-                           .subscribe(new Action1<UserInfoResult>() {
-                               @Override
-                               public void call(UserInfoResult userInfoResult) {
-                                    if (userInfoResult.isSuccessful()){
-                                        userInfo = userInfoResult.getUserInfo();
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
+                NetUtil.getAppUrl().getUsrInfo(NetUtil.id)
+                        .subscribe(new Action1<UserInfoResult>() {
+                            @Override
+                            public void call(UserInfoResult userInfoResult) {
+                                if (userInfoResult.isSuccessful()) {
+                                    userInfo = userInfoResult.getUserInfo();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if(userInfo.getHead()!=null){
                                                 Glide.with(MainActivity.this)
                                                         .load(userInfo.getHead())
                                                         .into(ivHead);
                                             }
-                                        });
-                                    }
-                               }
-                           });
+                                        }
+                                    });
+                                }
+                            }
+                        });
             }
         }).start();
     }
 
-    public void head(View v){
-        Intent intent = new Intent(this,UserInfoActivity.class);
-        intent.putExtra("info",userInfo);
+    public void head(View v) {
+        Intent intent = new Intent(this, UserInfoActivity.class);
+        intent.putExtra("info", userInfo);
         startActivity(intent);
     }
 
     @Override
     public void onBackPressed() {
-        if (quit){
+        if (quit) {
             super.onBackPressed();
             return;
         } else {
@@ -322,6 +314,12 @@ public class MainActivity extends BaseActivity {
             public void run() {
                 quit = false;
             }
-        },2000);
+        }, 2000);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        requestUserInfo();
     }
 }

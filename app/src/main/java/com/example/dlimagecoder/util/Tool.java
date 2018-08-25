@@ -2,12 +2,15 @@ package com.example.dlimagecoder.util;
 
 import android.support.v7.widget.RecyclerView;
 
+import com.example.dlimagecoder.netmodel.SerTiezi;
+import com.example.dlimagecoder.netmodel.Tiezi;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tool {
@@ -26,9 +29,10 @@ public class Tool {
 
 
     //解析出图片地址数组
-    public static List<String> getImagesFromString(String json){
+    public static List<String> str2List(String json){
         Type listType = new TypeToken<List<String>>(){}.getType();
-        return new Gson().fromJson(json,listType);
+        List<String> res =  new Gson().fromJson(json,listType);
+        return res == null ? new ArrayList<String>() : res;
     }
     //UTF-8编码字符串
     public static String UTF8(String str){
@@ -38,5 +42,15 @@ public class Tool {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static SerTiezi geneTiezi(Tiezi tiezi){
+        return new SerTiezi(tiezi.getMomentId(),tiezi.getUserId(),tiezi.getText(),
+                tiezi.getTime(),tiezi.getLikes(),tiezi.getComments(),tiezi.getImgs());
+    }
+
+    public static Tiezi getTiezi(SerTiezi tiezi){
+        return new Tiezi(tiezi.getId(),tiezi.getAuthorId(),tiezi.getText(),
+                tiezi.getTime(),tiezi.getAppro(),tiezi.getComment(),tiezi.getPicsText());
     }
 }

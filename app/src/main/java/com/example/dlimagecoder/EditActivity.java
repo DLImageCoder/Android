@@ -9,9 +9,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.base.BaseActivity;
 import com.example.dlimagecoder.netmodel.ImgProcessResult;
-import com.example.dlimagecoder.netmodel.NetResult;
 import com.example.dlimagecoder.util.NetUtil;
-import com.example.dlimagecoder.util.PictureUtil;
 import com.example.dlimagecoder.util.ToastUtil;
 import com.example.dlimagecoder.util.Tool;
 
@@ -36,7 +34,7 @@ public class EditActivity extends BaseActivity {
     protected void initVariable() {
         Intent intent  =getIntent();
         currentImagePath = intent.getStringExtra(CameraActivity.IMAGE_PATH);
-        images = Tool.getImagesFromString(intent.getStringExtra(CameraActivity.IMAGES));
+        images = Tool.str2List(intent.getStringExtra(CameraActivity.IMAGES));
     }
 
     @Override

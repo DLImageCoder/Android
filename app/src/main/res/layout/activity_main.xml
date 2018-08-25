@@ -11,7 +11,7 @@
         layout="@layout/background_color"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:text="社区"
+        android:id="@+id/ivHead"
         android:onClick="head"
         android:textColor="#fff"
         android:layout_marginLeft="16dp"
