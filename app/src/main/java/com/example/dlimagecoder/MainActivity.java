@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.adapter.TieziAdapter;
 import com.example.dlimagecoder.base.BaseActivity;
+import com.example.dlimagecoder.netmodel.NetResult;
 import com.example.dlimagecoder.netmodel.Tiezi;
 import com.example.dlimagecoder.netmodel.TieziResult;
 import com.example.dlimagecoder.netmodel.UserInfo;
@@ -75,8 +76,39 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            public void onItemLongClick(View view, int position) {
-
+            public void onItemLongClick(View view, final int position) {
+                if (NetUtil.id.equals(""+list.get(position).getUserId())){
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setMessage("确定要删除帖子吗")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            NetUtil.getAppUrl().deleteTiezi(list.get(position).getMomentId(),NetUtil.id)
+                                                    .subscribe(new Action1<NetResult>() {
+                                                        @Override
+                                                        public void call(NetResult netResult) {
+                                                            if (netResult.isSuccessful()){
+                                                                runOnUiThread(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        list.remove(position);
+                                                                        adapter.notifyItemRemoved(position);
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    });
+                                        }
+                                    }).start();
+                                }
+                            })
+                            .setNegativeButton("取消",null)
+                            .create()
+                            .show();
+                }
             }
         });
     }
@@ -143,7 +175,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 try {
-                    NetUtil.getAppUrl().getTiezi(list.get(list.size() - 1).getMomentId())
+                    NetUtil.getAppUrl().getTiezi(list.get(list.size() - 1).getMomentId(),NetUtil.id)
                             .subscribe(new Action1<TieziResult>() {
                                 @Override
                                 public void call(TieziResult netResult) {
@@ -185,7 +217,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 try {
-                    NetUtil.getAppUrl().getTiezi(-1)
+                    NetUtil.getAppUrl().getTiezi(-1,NetUtil.id)
                             .subscribe(new Action1<TieziResult>() {
                                 @Override
                                 public void call(TieziResult netResult) {

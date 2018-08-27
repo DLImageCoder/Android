@@ -44,7 +44,7 @@ public interface AppUrl {
     //获取帖子,page其实是当前帖子的最小id
     @GET("moment/getMoment")
     Observable<TieziResult> getTiezi
-    (@Query("mid") int mid);
+    (@Query("mid") int mid,@Query("uid") String uid);
 
 
     //处理图片
@@ -61,5 +61,10 @@ public interface AppUrl {
     @GET("moment/comment")
     Observable<NetResult> comment
     (@Query("momentId") int momentId, @Query("text") String text,@Query("userId") int userId,@Query("type") int type);
+
+    //删除帖子
+    @GET("moment/deleteMoment")
+    Observable<NetResult> deleteTiezi
+    (@Query("momentId") int momentId, @Query("userId") String userId );
 
 }

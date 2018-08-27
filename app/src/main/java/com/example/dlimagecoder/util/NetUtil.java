@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -40,7 +41,10 @@ public class NetUtil {
     private static final String IMAGE_HOST = "http://pcqi1922c.bkt.clouddn.com/";
 
     private NetUtil() {
-        mOkHttpClient = new OkHttpClient();
+        mOkHttpClient = new OkHttpClient.Builder().
+                connectTimeout(30, TimeUnit.SECONDS).
+                readTimeout(30, TimeUnit.SECONDS).
+                writeTimeout(30, TimeUnit.SECONDS).build();
     }
 
     public static NetUtil getInstance() {
