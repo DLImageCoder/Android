@@ -1,6 +1,5 @@
 package com.example.dlimagecoder;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,6 +11,7 @@ import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.base.BaseActivity;
 import com.example.dlimagecoder.netmodel.ImgProcessResult;
 import com.example.dlimagecoder.util.NetUtil;
+import com.example.dlimagecoder.util.PictureUtil;
 import com.example.dlimagecoder.util.ToastUtil;
 import com.example.dlimagecoder.util.Tool;
 
@@ -19,11 +19,16 @@ import java.util.List;
 
 import rx.functions.Action1;
 
+import static com.example.dlimagecoder.util.NetUtil.IMAGE_HOST;
+
 public class EditActivity extends BaseActivity {
 
     private ImageView image;
 
-    private String currentImagePath;
+    private String currentImageLocalPath;
+    private String currentImageNetString;
+    private String currentImageResizePath;
+    private String currentProcessImagePath;//处理过的当前图片网络路径
     private Bitmap currentBitmap;
     private List<String> images;//已经处理好的图片
 
@@ -37,7 +42,7 @@ public class EditActivity extends BaseActivity {
     @Override
     protected void initVariable() {
         Intent intent  =getIntent();
-        currentImagePath = intent.getStringExtra(CameraActivity.IMAGE_PATH);
+        currentImageLocalPath = intent.getStringExtra(CameraActivity.IMAGE_PATH);
         images = Tool.str2List(intent.getStringExtra(CameraActivity.IMAGES));
 
         dialog = new ProgressDialog(this);
@@ -52,15 +57,19 @@ public class EditActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        if (currentImagePath!=null)
-            Glide.with(this).load(currentImagePath).into(image);
+        if (currentImageLocalPath !=null)
+            Glide.with(this).load(currentImageLocalPath).into(image);
 
     }
 
     //下一步
     public void next(View view){
-        if (!currentImagePath.isEmpty()){
-            images.add(currentImagePath);
+        if (!currentProcessImagePath.isEmpty()){
+            images.add(currentProcessImagePath);
+        } else if (!currentImageNetString.isEmpty()){
+            images.add(currentImageNetString);
+        } else if (!currentImageLocalPath.isEmpty()){
+            images.add(currentImageLocalPath);
         }
         if (images.size()>0){
             Intent intent = new Intent(this,PreviewActivity.class);
@@ -77,7 +86,7 @@ public class EditActivity extends BaseActivity {
             ToastUtil.showToast("最多三张");
             return;
         }
-        images.add(currentImagePath);
+        images.add(currentImageLocalPath);
         Intent intent = new Intent();
         intent.putExtra(CameraActivity.IMAGES,Tool.imagesToString(images));
         setResult(RESULT_OK,intent);
@@ -99,16 +108,28 @@ public class EditActivity extends BaseActivity {
                 process(3);
                 break;
             case R.id.btnPro5:
-                process(5);
+                process(4);
                 break;
             case R.id.btnPro6:
-                process(6);
+                process(5);
                 break;
             case R.id.btnPro7:
-                process(7);
+                process(6);
                 break;
             case R.id.btnPro8:
+                process(7);
+                break;
+            case R.id.btnPro9:
                 process(8);
+                break;
+            case R.id.btnPro10:
+                process(9);
+                break;
+            case R.id.btnPro11:
+                process(10);
+                break;
+            case R.id.btnPro12:
+                process(11);
                 break;
         }
     }
@@ -118,15 +139,17 @@ public class EditActivity extends BaseActivity {
     }
 
     public void store(View v){
-        ToastUtil.showToast("照片已保存到："+currentImagePath);
+        ToastUtil.showToast("照片已保存到："+ currentImageLocalPath);
     }
 
     public void process(final int type){
+
         dialog.show();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String s = NetUtil.uploadImage(currentImagePath);
+                String s = currentImageNetString==null ?
+                        currentImageNetString=NetUtil.uploadImage(PictureUtil.resize256Img(currentImageLocalPath)) : currentImageNetString;
                 Log.v("zy",s);
                 NetUtil.getAppUrl().processImg(s,type)
                         .subscribe(new Action1<ImgProcessResult>() {
@@ -136,9 +159,9 @@ public class EditActivity extends BaseActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            currentImagePath = netResult.getUrl();
+                                            currentProcessImagePath = netResult.getUrl();
                                             Glide.with(EditActivity.this)
-                                                    .load(currentImagePath)
+                                                    .load(currentProcessImagePath)
                                                     .into(image);
                                             dialog.dismiss();
                                             ToastUtil.showToast("处理成功");
@@ -152,6 +175,7 @@ public class EditActivity extends BaseActivity {
                         });
             }
         }).start();
+
     }
 
 

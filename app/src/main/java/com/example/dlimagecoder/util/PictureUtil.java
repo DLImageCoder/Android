@@ -28,11 +28,11 @@ public class PictureUtil {
     }
 
     public static String resize128Img(String path){
-        return resizeImg(path,128,128);
+        return centerSquareScaleBitmap(path,128);
     }
 
     public static String resize256Img(String path){
-        return resizeImg(path,256,256);
+        return centerSquareScaleBitmap(path,256);
     }
 
     /**

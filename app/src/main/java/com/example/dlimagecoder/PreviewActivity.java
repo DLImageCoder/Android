@@ -73,14 +73,20 @@ public class PreviewActivity extends BaseActivity {
         final List<String> imageUrls = new ArrayList<>();
         for (String path : paths){
             final String p = path;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    String path= NetUtil.uploadImage(p);
-                    imageUrls.add(path);
-                    uploadImages--;
-                }
-            }).start();
+            if (p.contains("http")){
+                //已经是网络路径
+                imageUrls.add(p);
+                uploadImages--;
+            } else {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String path= NetUtil.uploadImage(p);
+                        imageUrls.add(path);
+                        uploadImages--;
+                    }
+                }).start();
+            }
         }
         new Thread(new Runnable() {
             @Override
@@ -134,6 +140,6 @@ public class PreviewActivity extends BaseActivity {
                 .setNegativeButton("取消", null)
                 .create()
                 .show();
-       // super.onBackPressed();
+        // super.onBackPressed();
     }
 }

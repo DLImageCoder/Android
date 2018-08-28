@@ -38,7 +38,7 @@ public class NetUtil {
     public static String pwd;
 
     private static final String HOST = "http://47.106.140.199:8080/";
-    private static final String IMAGE_HOST = "http://pcqi1922c.bkt.clouddn.com/";
+    public static final String IMAGE_HOST = "http://pcqi1922c.bkt.clouddn.com/";
 
     private NetUtil() {
         mOkHttpClient = new OkHttpClient.Builder().
@@ -60,7 +60,10 @@ public class NetUtil {
 
     public static AppUrl getAppUrl(){
         if (mOkHttpClient == null){
-            mOkHttpClient = new OkHttpClient();
+            mOkHttpClient = new OkHttpClient.Builder().
+                    connectTimeout(60, TimeUnit.SECONDS).
+                    readTimeout(60, TimeUnit.SECONDS).
+                    writeTimeout(60, TimeUnit.SECONDS).build();
         }
         if (appUrl==null){
             Retrofit retrofit=new Retrofit.Builder()
