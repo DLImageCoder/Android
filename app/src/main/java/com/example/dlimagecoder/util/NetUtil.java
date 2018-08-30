@@ -1,6 +1,8 @@
 package com.example.dlimagecoder.util;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.example.dlimagecoder.common.Constrants;
@@ -18,8 +20,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Call;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -117,5 +121,19 @@ public class NetUtil {
                         });
             }
         }).start();
+    }
+
+    public static Bitmap download(String url){
+        Request request = new Request.Builder()
+                .url(url).build();
+        Call call = mOkHttpClient.newCall(request);
+        try {
+            Response response = call.execute();
+            InputStream inputStream = response.body().byteStream();
+            return BitmapFactory.decodeStream(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.example.dlimagecoder.base.BaseActivity;
 import com.example.dlimagecoder.netmodel.ImgProcessResult;
+import com.example.dlimagecoder.util.FileUtil;
 import com.example.dlimagecoder.util.NetUtil;
 import com.example.dlimagecoder.util.PictureUtil;
 import com.example.dlimagecoder.util.ToastUtil;
@@ -28,6 +29,7 @@ public class EditActivity extends BaseActivity {
     private String currentImageLocalPath;
     private String currentImageNetString;
     private String currentImageResizePath;
+    private String currentLocalProcessPath;//已保存到的已处理的本地路径
     private String currentProcessImagePath;//处理过的当前图片网络路径
     private Bitmap currentBitmap;
     private List<String> images;//已经处理好的图片
@@ -108,27 +110,18 @@ public class EditActivity extends BaseActivity {
                 process(3);
                 break;
             case R.id.btnPro5:
-                process(4);
-                break;
-            case R.id.btnPro6:
-                process(5);
-                break;
-            case R.id.btnPro7:
-                process(6);
-                break;
-            case R.id.btnPro8:
                 process(7);
                 break;
-            case R.id.btnPro9:
+            case R.id.btnPro6:
                 process(8);
                 break;
-            case R.id.btnPro10:
+            case R.id.btnPro7:
                 process(9);
                 break;
-            case R.id.btnPro11:
+            case R.id.btnPro8:
                 process(10);
                 break;
-            case R.id.btnPro12:
+            case R.id.btnPro9:
                 process(11);
                 break;
         }
@@ -139,7 +132,33 @@ public class EditActivity extends BaseActivity {
     }
 
     public void store(View v){
-        ToastUtil.showToast("照片已保存到："+ currentImageLocalPath);
+        if (currentImageNetString==null){
+            ToastUtil.showToast("图片尚未处理");
+            return;
+        }
+        if (currentLocalProcessPath!=null){
+            ToastUtil.showToast("图片已保存");
+            return;
+        }
+        dialog.show();
+        final String s = currentProcessImagePath;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = NetUtil.download(s);
+                if (bitmap !=null){
+                    final String path  = FileUtil.storeNetImage(bitmap);
+                    currentLocalProcessPath = path;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.showToast("照片已保存到："+ path);
+                        }
+                    });
+                }
+                dialog.dismiss();
+            }
+        }).start();
     }
 
     public void process(final int type){

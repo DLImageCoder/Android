@@ -64,6 +64,7 @@ public class UserInfoActivity extends BaseActivity {
 
     //不必检查
     public void post(View v){
+        ToastUtil.showToast("处理中");
         name = nameEt.getText().toString();
         age = Integer.parseInt(ageEt.getText().toString());
         new Thread(new Runnable() {

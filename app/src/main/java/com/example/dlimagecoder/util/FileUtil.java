@@ -1,6 +1,7 @@
 package com.example.dlimagecoder.util;
 
 import android.graphics.Bitmap;
+import android.os.Environment;
 
 import com.example.dlimagecoder.DLImageCoder;
 
@@ -21,6 +22,22 @@ public class FileUtil {
         }
         String name = ""+System.currentTimeMillis()+".jpg";
         String path = FILE_DIR+"/"+name;
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100,
+                    new FileOutputStream(new File(path)));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return path;
+    }
+
+    public static String storeNetImage(Bitmap bitmap){
+        File fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/dlimages");
+        if (!fileDir.exists()){
+            fileDir.mkdirs();
+        }
+        String name = ""+System.currentTimeMillis()+".jpg";
+        String path = fileDir.getPath()+"/"+name;
         try {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100,
                     new FileOutputStream(new File(path)));

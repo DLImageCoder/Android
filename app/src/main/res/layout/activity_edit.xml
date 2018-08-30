@@ -74,28 +74,28 @@
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1" />
+                android:text="wave" />
 
             <Button
                 android:id="@+id/btnPro2"
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2" />
+                android:text="udnie" />
 
             <Button
                 android:id="@+id/btnPro3"
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3" />
+                android:text="scream" />
 
             <Button
                 android:id="@+id/btnPro4"
-                android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="4" />
+                android:onClick="process"
+                android:text="princess" />
 
         </LinearLayout>
 
@@ -111,28 +111,28 @@
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5" />
+                android:text="male" />
 
             <Button
                 android:id="@+id/btnPro6"
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="6" />
+                android:text="female" />
 
             <Button
                 android:id="@+id/btnPro7"
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7" />
+                android:text="smile" />
 
             <Button
                 android:id="@+id/btnPro8"
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="8" />
+                android:text="hair-black" />
 
         </LinearLayout>
 
@@ -148,28 +148,9 @@
                 android:onClick="process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="9" />
+                android:text="hair-brown" />
 
-            <Button
-                android:id="@+id/btnPro10"
-                android:onClick="process"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10" />
 
-            <Button
-                android:id="@+id/btnPro11"
-                android:onClick="process"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="11" />
-
-            <Button
-                android:id="@+id/btnPro12"
-                android:onClick="process"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="12" />
 
         </LinearLayout>
 
